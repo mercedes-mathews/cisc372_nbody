@@ -2,6 +2,7 @@ FLAGS= -DDEBUG
 LIBS= -lm
 ALWAYS_REBUILD=makefile
 
+all: nbody-cuda nbody
 nbody-cuda: nbody.o compute.cu
 	nvcc $(FLAGS) $^ -o $@ $(LIBS)
 nbody: nbody.o compute.o

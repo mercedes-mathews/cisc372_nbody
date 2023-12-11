@@ -4,7 +4,7 @@
 #include "vector.h"
 #include "config.h"
 
-__global__ void compute_cuda(vector3** accels, double *hPos, double *hVel, double *mass){
+__global__ void compute_cuda(vector3** accels, vector3* hPos, vector3* hVel, vector3* mass){
 	//make an acceleration matrix which is NUMENTITIES squared in size;
 	int k;
 
@@ -18,7 +18,9 @@ __global__ void compute_cuda(vector3** accels, double *hPos, double *hVel, doubl
 		}
 		else {
 			vector3 distance;
-			for (k=0;k<3;k++) distance[k]=hPos[i][k]-hPos[j][k];
+			for (k=0;k<3;k++) {
+				distance[k]=hPos[i][k]-hPos[j][k];
+			}
 			double magnitude_sq=distance[0]*distance[0]+distance[1]*distance[1]+distance[2]*distance[2];
 			double magnitude=sqrt(magnitude_sq);
 			double accelmag=-1*GRAV_CONSTANT*mass[j]/magnitude_sq;
@@ -37,14 +39,13 @@ extern "C" void compute() {
 	for (int i=0;i<NUMENTITIES;i++) {
 		accels[i]=&values[i*NUMENTITIES];
 	}
-
 	
-	double *hPosDevice, *hVelDevice, *massDevice;
-    size_t pvSize = sizeof(double) * NUMENTITIES * 3;
-    size_t massSize = sizeof(double) * NUMENTITIES;
-    cudaMalloc((void **)&hPosDevice, pvSize);
-    cudaMalloc((void **)&hVelDevice, pvSize);
-    cudaMalloc((void **)&massDevice, massSize);
+	vector3 *hPosDevice, *hVelDevice, *massDevice;
+    size_t pvSize = sizeof(vector3) * NUMENTITIES * 3;
+    size_t massSize = sizeof(vector3) * NUMENTITIES;
+    cudaMalloc(&hPosDevice, pvSize);
+    cudaMalloc(&hVelDevice, pvSize);
+    cudaMalloc(&massDevice, massSize);
 
 	// Data -> device
     cudaMemcpy(hPosDevice, hPos, pvSize, cudaMemcpyHostToDevice);

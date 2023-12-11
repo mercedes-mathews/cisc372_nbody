@@ -1,3 +1,7 @@
+/*
+Group Partners: Mercedes Mathews and Abdulrahman Abdulhamid 
+*/
+
 #include <stdlib.h>
 #include <math.h>
 #include <cuda_runtime.h>
@@ -61,10 +65,6 @@ extern "C" void compute() {
 	// Synchronize CUDA call
 	// Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();
-
-	// Updated data -> host
-    // cudaMemcpy(hPos, hPosDevice, pvSize, cudaMemcpyDeviceToHost);
-    // cudaMemcpy(hVel, hVelDevice, pvSize, cudaMemcpyDeviceToHost);
 
 	//sum up the rows of our matrix to get effect on each entity, then update velocity and position.
 	for (int i=0;i<NUMENTITIES;i++){

@@ -33,7 +33,7 @@ void compute() {
 	size_t accelsSize = sizeof(vector3*) * NUMENTITIES * NUMENTITIES;
 	cudaMallocManaged(&values, valuesSize);
     cudaMallocManaged(&accels, accelsSize);
-	for (i=0;i<NUMENTITIES;i++) {
+	for (int i=0;i<NUMENTITIES;i++) {
 		accels[i]=&values[i*NUMENTITIES];
 	}
 

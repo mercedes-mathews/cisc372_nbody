@@ -34,7 +34,7 @@ void compute() {
 	cudaMallocManaged(&values, valuesSize);
     cudaMallocManaged(&accels, accelsSize);
 	for (i=0;i<NUMENTITIES;i++) {
-		accels[i]=&values[i*NUMENTITIES]
+		accels[i]=&values[i*NUMENTITIES];
 	}
 
 	// execute the cuda call

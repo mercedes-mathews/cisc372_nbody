@@ -23,15 +23,6 @@ __global__ void compute_cuda(vector3** accels){
 			double accelmag=-1*GRAV_CONSTANT*mass[j]/magnitude_sq;
 			FILL_VECTOR(accels[i][j],accelmag*distance[0]/magnitude,accelmag*distance[1]/magnitude,accelmag*distance[2]/magnitude);
 		}
-
-		//sum up the rows of our matrix to get effect on each entity, then update velocity and position.
-        vector3 accel_sum={0,0,0};
-		for (k=0;k<3;k++)
-			accel_sum[k]+=accels[i][j][k];
-        for (k=0;k<3;k++){
-			hVel[i][k]+=accel_sum[k]*INTERVAL;
-			hPos[i][k]+=hVel[i][k]*INTERVAL;
-		}
 	}
 }
 

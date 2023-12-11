@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include <cuda_runtime.h>
 #include "vector.h"
 #include "config.h"
 
@@ -26,7 +27,7 @@ __global__ void compute_cuda(vector3** accels){
 	}
 }
 
-void compute() {
+extern "C" void compute() {
 	vector3* values;
 	vector3** accels;
 	size_t valuesSize = sizeof(vector3) * NUMENTITIES * NUMENTITIES;
@@ -66,7 +67,3 @@ void compute() {
 	// CUDA free values
 	cudaFree(accels);
 }
-
-
-
-

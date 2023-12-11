@@ -4,7 +4,7 @@
 #include "vector.h"
 #include "config.h"
 
-__global__ void compute_cuda(vector3** accels){
+__global__ void compute_cuda(vector3** accels, double *hPos, double *hVel, double *mass){
 	//make an acceleration matrix which is NUMENTITIES squared in size;
 	int k;
 
@@ -38,14 +38,31 @@ extern "C" void compute() {
 		accels[i]=&values[i*NUMENTITIES];
 	}
 
+	
+	double *hPosDevice, *hVelDevice, *massDevice;
+    size_t pvSize = sizeof(double) * NUMENTITIES * 3;
+    size_t massSize = sizeof(double) * NUMENTITIES;
+    cudaMalloc((void **)&hPosDevice, pvSize);
+    cudaMalloc((void **)&hVelDevice, pvSize);
+    cudaMalloc((void **)&massDevice, massSize);
+
+	// Data -> device
+    cudaMemcpy(hPosDevice, hPos, pvSize, cudaMemcpyHostToDevice);
+    cudaMemcpy(hVelDevice, hVel, pvSize, cudaMemcpyHostToDevice);
+    cudaMemcpy(massDevice, mass, massSize, cudaMemcpyHostToDevice);
+
 	// execute the cuda call
 	dim3 threadPerBlock(4, 4);
     dim3 numBlocks((NUMENTITIES/threadPerBlock.x) + 1, (NUMENTITIES/threadPerBlock.y) + 1);
-	compute_cuda<<<numBlocks,threadPerBlock>>>(accels);
+	compute_cuda<<<numBlocks,threadPerBlock>>>(accels, hPosDevice, hVelDevice, massDevice);
 
 	// Synchronize CUDA call
 	// Wait for GPU to finish before accessing on host
     cudaDeviceSynchronize();
+
+	// Updated data -> host
+    // cudaMemcpy(hPos, hPosDevice, pvSize, cudaMemcpyDeviceToHost);
+    // cudaMemcpy(hVel, hVelDevice, pvSize, cudaMemcpyDeviceToHost);
 
 	//sum up the rows of our matrix to get effect on each entity, then update velocity and position.
 	for (int i=0;i<NUMENTITIES;i++){
@@ -62,8 +79,9 @@ extern "C" void compute() {
 		}
 	}
 
-	// CUDA free accels
-	cudaFree(values);
-	// CUDA free values
+    cudaFree(hPosDevice);
+    cudaFree(hVelDevice);
+    cudaFree(massDevice);
+    cudaFree(values);
 	cudaFree(accels);
 }

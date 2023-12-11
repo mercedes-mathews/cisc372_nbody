@@ -4,7 +4,7 @@
 #include "vector.h"
 #include "config.h"
 
-__global__ void compute_cuda(vector3** accels, vector3* hPos, vector3* hVel, vector3* mass){
+__global__ void compute_cuda(vector3** accels, vector3* hPos, vector3* hVel, double* mass){
 	//make an acceleration matrix which is NUMENTITIES squared in size;
 	int k;
 
@@ -40,9 +40,10 @@ extern "C" void compute() {
 		accels[i]=&values[i*NUMENTITIES];
 	}
 	
-	vector3 *hPosDevice, *hVelDevice, *massDevice;
+	vector3 *hPosDevice, *hVelDevice;
+	double *massDevice;
     size_t pvSize = sizeof(vector3) * NUMENTITIES * 3;
-    size_t massSize = sizeof(vector3) * NUMENTITIES;
+    size_t massSize = sizeof(double) * NUMENTITIES;
     cudaMalloc(&hPosDevice, pvSize);
     cudaMalloc(&hVelDevice, pvSize);
     cudaMalloc(&massDevice, massSize);
